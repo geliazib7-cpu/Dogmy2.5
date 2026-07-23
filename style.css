@@ -1,0 +1,295 @@
+/* ======================================
+   DOGMY 2.5 - ESTILOS COMPLETOS
+   ====================================== */
+
+/* Reset y base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffe600, #7ed957);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Contenedor principal */
+.contenedor {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Tarjeta central */
+.tarjeta {
+    width: 90%;
+    max-width: 420px;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    text-align: center;
+}
+.logo {
+    width: 180px;
+    max-width: 80%;
+    display: block;
+    margin: 0 auto 20px auto;
+    border-radius: 15px;
+}
+
+/* Títulos */
+h1 {
+    color: #2e7d32;
+    margin-bottom: 5px;
+    font-size: 28px;
+}
+
+h3 {
+    color: #2e7d32;
+    margin: 15px 0 10px 0;
+}
+
+.subtitulo {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+/* Inputs y textarea */
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #7ed957;
+}
+
+/* Botones */
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .3s;
+}
+
+button:hover {
+    background: #1b5e20;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .2);
+}
+
+/* Botones de colores especiales */
+button[style*="background:#ff9800"] {
+    background: #ff9800 !important;
+}
+
+button[style*="background:#d32f2f"] {
+    background: #d32f2f !important;
+}
+
+button[style*="background:#2196f3"] {
+    background: #2196f3 !important;
+}
+
+/* Calendario de días */
+.calendario {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.calendario label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.calendario input {
+    display: none;
+}
+
+.calendario span {
+    width: 65px;
+    padding: 10px 0;
+    border-radius: 12px;
+    background: #eeeeee;
+    font-weight: bold;
+    text-align: center;
+    transition: .3s;
+    display: block;
+    font-size: 14px;
+    color: #555;
+}
+
+.calendario input:checked + span {
+    background: #7ed957;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .25);
+}
+
+/* Logo */
+.logo {
+    width: 180px;
+    max-width: 80%;
+    display: block;
+    margin: 0 auto 20px auto;
+    border-radius: 15px;
+}
+
+/* Versión */
+.version {
+    font-size: 14px;
+    color: #666;
+    margin-top: 20px;
+}
+
+/* Estados de paseo */
+.estado-paseo {
+    padding: 15px;
+    border-radius: 12px;
+    margin: 10px 0;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.en-curso {
+    background: #fff3cd;
+    color: #856404;
+    border: 2px solid #ffc107;
+}
+
+.disponible {
+    background: #d4edda;
+    color: #155724;
+    border: 2px solid #28a745;
+}
+
+/* Cronómetro */
+#cronometroBox {
+    background: linear-gradient(135deg, #fff3cd, #ffe082);
+    border: 2px solid #ffc107;
+}
+
+#cronometro {
+    font-family: 'Courier New', monospace;
+    font-size: 36px;
+    font-weight: bold;
+    color: #2e7d32;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Mapa / Rastreo */
+#mapaAdmin,
+#mapaCliente,
+#mapaRastreo {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border: 2px dashed #2196f3;
+}
+
+/* Resumen Admin */
+#resumenAdmin {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    border: 2px solid #4caf50;
+}
+
+#resumenAdmin p {
+    margin: 8px 0;
+    color: #2e7d32;
+    font-size: 15px;
+}
+
+/* Tarjetas internas */
+.tarjeta .tarjeta {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+/* Select personalizado */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232e7d32' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #7ed957;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #2e7d32;
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.en-curso {
+    animation: pulse 2s infinite;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .tarjeta {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    .calendario {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .calendario span {
+        width: 100%;
+    }
+}
