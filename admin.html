@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2e7d32">
+
+<title>Panel Administrador</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffe600, #7ed957);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.contenedor {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.tarjeta {
+    width: 90%;
+    max-width: 420px;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    text-align: center;
+}
+
+h1 {
+    color: #2e7d32;
+    margin-bottom: 5px;
+    font-size: 24px;
+}
+
+.subtitulo {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+h3 {
+    color: #2e7d32;
+    margin: 15px 0 10px 0;
+    text-align: left;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1b5e20;
+}
+
+.resumen {
+    background: #e8f5e9;
+    border: 2px solid #4caf50;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.resumen p {
+    margin: 8px 0;
+    color: #2e7d32;
+    font-size: 15px;
+}
+
+.mapa-box {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border: 2px dashed #2196f3;
+    border-radius: 15px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+    padding: 20px;
+    flex-direction: column;
+}
+
+.mapa-box p {
+    color: #1565c0;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.paseador-activo {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.paseador-activo p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.paseador-activo .nombre {
+    font-weight: bold;
+    color: #856404;
+    font-size: 16px;
+}
+
+.cerrar {
+    background: #d32f2f !important;
+    margin-top: 20px;
+}
+
+.cerrar:hover {
+    background: #b71c1c !important;
+}
+
+.sin-paseos {
+    color: #666;
+    padding: 20px;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="contenedor">
+<div class="tarjeta">
+
+<h1>👔 Panel Administrador</h1>
+<p class="subtitulo">Dueño de la Empresa</p>
+
+<div class="resumen">
+    <p><b>🐶 Total Perros:</b> <span id="totalPerros">0</span></p>
+    <p><b>👥 Total Clientes:</b> <span id="totalClientes">0</span></p>
+    <p><b>🚶 Paseadores:</b> <span id="totalPaseadores">0</span></p>
+    <p><b>🟡 Paseos en Curso:</b> <span id="paseosActivos">0</span></p>
+</div>
+
+<hr>
+
+<h3>📍 Rastreo de Paseadores</h3>
+
+<div class="mapa-box" id="mapaBox">
+    <p style="font-size:60px;margin-bottom:10px;">🗺️</p>
+    <p id="mapaTexto">Cargando ubicaciones...</p>
+</div>
+
+<div id="listaPaseadoresActivos">
+    <p class="sin-paseos">🟢 Ningún paseo en curso</p>
+</div>
+
+<hr>
+
+<h3>⚙️ Gestión</h3>
+<button onclick="window.location.href='registro.html?tipo=paseador'">➕ Registrar Paseador</button>
+<button onclick="window.location.href='registro.html?tipo=cliente'">➕ Registrar Cliente + Perro</button>
+<button onclick="window.location.href='agenda.html'">📅 Ver Agenda Completa</button>
+<button onclick="window.location.href='lista_clientes.html'">👥 Lista de Clientes</button>
+
+<button onclick="window.location.href='index.html'" class="cerrar">🚪 Cerrar Sesión</button>
+
+</div>
+</div>
+
+<script>
+// ======================================
+// PANEL ADMINISTRADOR - CON RASTREO
+// ======================================
+
+// Verificar sesion
+const sesionActiva = localStorage.getItem("sesionActiva");
+if (sesionActiva !== "admin") {
+    window.location.href = "index.html";
+}
+
+// Contadores
+const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+const perros = JSON.parse(localStorage.getItem("perros")) || [];
+const paseadores = JSON.parse(localStorage.getItem("paseadores")) || [];
+const paseosActivos = paseadores.filter(p => p.activo).length;
+
+document.getElementById("totalPerros").textContent = perros.length;
+document.getElementById("totalClientes").textContent = clientes.length;
+document.getElementById("totalPaseadores").textContent = paseadores.length;
+document.getElementById("paseosActivos").textContent = paseosActivos;
+
+// Mostrar paseadores activos con ubicacion
+function actualizarRastreo() {
+    const lista = document.getElementById("listaPaseadoresActivos");
+    const mapaBox = document.getElementById("mapaBox");
+    const mapaTexto = document.getElementById("mapaTexto");
+    
+    const activos = paseadores.filter(p => p.activo);
+
+    if (activos.length === 0) {
+        lista.innerHTML = '<p class="sin-paseos">🟢 Ningún paseo en curso</p>';
+        mapaBox.innerHTML = '<p style="font-size:60px;margin-bottom:10px;">🏠</p><p>Todos los perros están en casa</p>';
+        return;
+    }
+
+    // Actualizar mapa
+    let mapaHTML = '<p style="font-size:40px;margin-bottom:10px;">🗺️</p>';
+    mapaHTML += '<p><b>' + activos.length + ' paseo(s) activo(s)</b></p>';
+    
+    activos.forEach(p => {
+        const tiempo = p.horaInicio ? calcularTiempo(p.horaInicio) : "00:00:00";
+        const ubicacion = (p.lat && p.lon) 
+            ? "📍 " + p.lat.toFixed(5) + ", " + p.lon.toFixed(5)
+            : "📍 Ubicación no compartida aún";
+        
+        mapaHTML += '<p style="font-size:12px;margin-top:5px;">🚶 ' + p.nombre + ' - ' + tiempo + '</p>';
+        mapaHTML += '<p style="font-size:11px;">' + ubicacion + '</p>';
+    });
+    
+    mapaBox.innerHTML = mapaHTML;
+
+    // Lista detallada
+    lista.innerHTML = "";
+    activos.forEach(p => {
+        const tiempo = p.horaInicio ? calcularTiempo(p.horaInicio) : "00:00:00";
+        const ubicacion = (p.lat && p.lon) 
+            ? "Lat: " + p.lat.toFixed(5) + "<br>Lon: " + p.lon.toFixed(5)
+            : "Esperando ubicación...";
+
+        lista.innerHTML += `
+        <div class="paseador-activo">
+            <p class="nombre">🚶 ${p.nombre} - 🟡 En paseo</p>
+            <p>⏱️ Tiempo: <b>${tiempo}</b></p>
+            <p>📍 ${ubicacion}</p>
+            <p>📞 ${p.telefono}</p>
+        </div>`;
+    });
+}
+
+function calcularTiempo(horaInicio) {
+    const inicio = new Date(horaInicio);
+    const ahora = new Date();
+    const diff = Math.floor((ahora - inicio) / 1000);
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    const s = diff % 60;
+    return h.toString().padStart(2, "0") + ":" +
+           m.toString().padStart(2, "0") + ":" +
+           s.toString().padStart(2, "0");
+}
+
+// Actualizar cada 3 segundos
+actualizarRastreo();
+setInterval(actualizarRastreo, 3000);
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function() {});
+}
+</script>
+
+</body>
+</html>
