@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2e7d32">
+
+<title>Panel del Paseador</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffe600, #7ed957);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.contenedor {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.tarjeta {
+    width: 90%;
+    max-width: 420px;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    text-align: center;
+}
+
+h1 {
+    color: #2e7d32;
+    margin-bottom: 5px;
+    font-size: 24px;
+}
+
+.subtitulo {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+h3 {
+    color: #2e7d32;
+    margin: 10px 0;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1b5e20;
+}
+
+#btnPaseo {
+    background: #ff9800;
+    font-size: 18px;
+    padding: 16px;
+}
+
+#btnPaseo:hover {
+    background: #f57c00;
+}
+
+#cronometroBox {
+    background: linear-gradient(135deg, #fff3cd, #ffe082);
+    border: 2px solid #ffc107;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    display: none;
+}
+
+#cronometro {
+    font-family: 'Courier New', monospace;
+    font-size: 48px;
+    font-weight: bold;
+    color: #2e7d32;
+    margin: 10px 0;
+}
+
+#estado {
+    font-size: 18px;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.disponible {
+    background: #d4edda;
+    color: #155724;
+}
+
+.en-curso {
+    background: #fff3cd;
+    color: #856404;
+}
+
+#btnUbicacion {
+    background: #2196f3;
+}
+
+#btnUbicacion:hover {
+    background: #1976d2;
+}
+
+#btnUbicacion:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+#btnFoto {
+    background: #9c27b0;
+}
+
+#btnFoto:hover {
+    background: #7b1fa2;
+}
+
+#btnFoto:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.cerrar {
+    background: #d32f2f !important;
+    margin-top: 20px;
+}
+
+.cerrar:hover {
+    background: #b71c1c !important;
+}
+</style>
+</head>
+<body>
+<div class="contenedor">
+<div class="tarjeta">
+
+<h1>🐕 Panel del Paseador</h1>
+<p class="subtitulo" id="nombrePaseador">Bienvenido</p>
+
+<h3 id="estado" class="disponible">🟢 Disponible</h3>
+
+<!-- CRONOMETRO -->
+<div id="cronometroBox">
+    <p style="color:#856404;font-size:14px;margin-bottom:5px;">⏱️ Tiempo de paseo</p>
+    <p id="cronometro">00:00:00</p>
+</div>
+
+<button id="btnPaseo">🐶 Iniciar Paseo</button>
+
+<button onclick="window.location.href='agenda.html'">📅 Mi Agenda</button>
+
+<button id="btnUbicacion" onclick="compartirUbicacion()" disabled>📍 Compartir Ubicación</button>
+
+<button id="btnFoto" onclick="tomarFoto()" disabled>📷 Tomar Foto</button>
+
+<button onclick="verHistorial()">📊 Mi Historial</button>
+
+<button onclick="window.location.href='index.html'" class="cerrar">🚪 Cerrar Sesión</button>
+
+</div>
+</div>
+
+<script>
+// ======================================
+// PANEL PASEADOR - CON CRONOMETRO
+// ======================================
+
+const paseadorActual = JSON.parse(localStorage.getItem("paseadorActual"));
+if (!paseadorActual) {
+    window.location.href = "index.html";
+} else {
+    document.getElementById("nombrePaseador").textContent = "Hola, " + paseadorActual.nombre;
+}
+
+const btnPaseo = document.getElementById("btnPaseo");
+const estado = document.getElementById("estado");
+const cronometroBox = document.getElementById("cronometroBox");
+const cronometroDisplay = document.getElementById("cronometro");
+const btnUbicacion = document.getElementById("btnUbicacion");
+const btnFoto = document.getElementById("btnFoto");
+
+let intervaloCronometro = null;
+
+// Verificar si hay paseo activo guardado
+function verificarPaseoActivo() {
+    const paseadores = JSON.parse(localStorage.getItem("paseadores")) || [];
+    const miIndex = paseadores.findIndex(p => p.id === paseadorActual.id);
+    
+    if (miIndex !== -1 && paseadores[miIndex].activo) {
+        btnPaseo.innerHTML = "⏹ Finalizar Paseo";
+        estado.innerHTML = "🟡 Paseo en curso";
+        estado.className = "en-curso";
+        cronometroBox.style.display = "block";
+        btnUbicacion.disabled = false;
+        btnFoto.disabled = false;
+        iniciarCronometro(paseadores[miIndex].horaInicio);
+        return true;
+    }
+    return false;
+}
+
+// Iniciar cronometro
+function iniciarCronometro(horaInicio) {
+    if (intervaloCronometro) clearInterval(intervaloCronometro);
+
+    function actualizar() {
+        const inicio = new Date(horaInicio);
+        const ahora = new Date();
+        const diff = Math.floor((ahora - inicio) / 1000);
+        const h = Math.floor(diff / 3600);
+        const m = Math.floor((diff % 3600) / 60);
+        const s = diff % 60;
+        cronometroDisplay.textContent =
+            h.toString().padStart(2, "0") + ":" +
+            m.toString().padStart(2, "0") + ":" +
+            s.toString().padStart(2, "0");
+    }
+
+    actualizar();
+    intervaloCronometro = setInterval(actualizar, 1000);
+}
+
+// Detener cronometro
+function detenerCronometro() {
+    if (intervaloCronometro) {
+        clearInterval(intervaloCronometro);
+        intervaloCronometro = null;
+    }
+    cronometroDisplay.textContent = "00:00:00";
+}
+
+// Verificar al cargar
+verificarPaseoActivo();
+
+// Click en boton de paseo
+btnPaseo.addEventListener("click", function () {
+    const paseadores = JSON.parse(localStorage.getItem("paseadores")) || [];
+    const index = paseadores.findIndex(p => p.id === paseadorActual.id);
+
+    if (btnPaseo.innerHTML.includes("Iniciar")) {
+        // INICIAR PASEO
+        btnPaseo.innerHTML = "⏹ Finalizar Paseo";
+        estado.innerHTML = "🟡 Paseo en curso";
+        estado.className = "en-curso";
+        cronometroBox.style.display = "block";
+        btnUbicacion.disabled = false;
+        btnFoto.disabled = false;
+
+        const horaInicio = new Date().toISOString();
+        paseadores[index].activo = true;
+        paseadores[index].horaInicio = horaInicio;
+        paseadores[index].lat = null;
+        paseadores[index].lon = null;
+        localStorage.setItem("paseadores", JSON.stringify(paseadores));
+
+        iniciarCronometro(horaInicio);
+        alert("🐶 Paseo iniciado!\n\nEl cliente puede ver tu ubicación.\nPresiona '📍 Compartir Ubicación' para enviar tu posición.");
+
+    } else {
+        // FINALIZAR PASEO
+        btnPaseo.innerHTML = "🐶 Iniciar Paseo";
+        estado.innerHTML = "🟢 Disponible";
+        estado.className = "disponible";
+        cronometroBox.style.display = "none";
+        btnUbicacion.disabled = true;
+        btnFoto.disabled = true;
+
+        paseadores[index].activo = false;
+        paseadores[index].horaInicio = null;
+        paseadores[index].lat = null;
+        paseadores[index].lon = null;
+        localStorage.setItem("paseadores", JSON.stringify(paseadores));
+
+        detenerCronometro();
+        alert("✅ Paseo finalizado correctamente.");
+    }
+});
+
+// ======================================
+// COMPARTIR UBICACION EN TIEMPO REAL
+// ======================================
+function compartirUbicacion() {
+    if (!navigator.geolocation) {
+        alert("❌ Tu dispositivo no soporta geolocalización.");
+        return;
+    }
+
+    // Verificar si el paseo está activo
+    const paseadores = JSON.parse(localStorage.getItem("paseadores")) || [];
+    const index = paseadores.findIndex(p => p.id === paseadorActual.id);
+    
+    if (index === -1 || !paseadores[index].activo) {
+        alert("❌ Primero debes iniciar un paseo.");
+        return;
+    }
+
+    btnUbicacion.innerHTML = "📍 Obteniendo ubicación...";
+    
+    navigator.geolocation.getCurrentPosition(
+        function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            // Guardar ubicacion en el paseador
+            paseadores[index].lat = lat;
+            paseadores[index].lon = lon;
+            localStorage.setItem("paseadores", JSON.stringify(paseadores));
+
+            btnUbicacion.innerHTML = "📍 Ubicación enviada ✓";
+            
+            setTimeout(function() {
+                btnUbicacion.innerHTML = "📍 Compartir Ubicación";
+            }, 2000);
+
+            alert("📍 Ubicación compartida:\nLat: " + lat.toFixed(5) + "\nLon: " + lon.toFixed(5) + "\n\nEl cliente y el admin pueden verte ahora.");
+        },
+        function (error) {
+            btnUbicacion.innerHTML = "📍 Compartir Ubicación";
+            
+            let mensaje = "❌ No se pudo obtener la ubicación.";
+            if (error.code === 1) mensaje += "\nPermiso denegado. Activa el GPS.";
+            if (error.code === 2) mensaje += "\nGPS no disponible.";
+            if (error.code === 3) mensaje += "\nTiempo de espera agotado.";
+            
+            alert(mensaje);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+// ======================================
+// TOMAR FOTO
+// ======================================
+function tomarFoto() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "environment";
+    input.onchange = function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const fotos = JSON.parse(localStorage.getItem("fotosPaseo")) || [];
+                fotos.push({
+                    imagen: event.target.result,
+                    fecha: new Date().toISOString(),
+                    paseador: paseadorActual.nombre
+                });
+                localStorage.setItem("fotosPaseo", JSON.stringify(fotos));
+                alert("📷 Foto guardada del paseo.");
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    input.click();
+}
+
+// ======================================
+// VER HISTORIAL
+// ======================================
+function verHistorial() {
+    const fotos = JSON.parse(localStorage.getItem("fotosPaseo")) || [];
+    const misFotos = fotos.filter(f => f.paseador === paseadorActual.nombre);
+
+    if (misFotos.length === 0) {
+        alert("📊 No hay fotos en tu historial.");
+        return;
+    }
+    alert("📊 Tu historial: " + misFotos.length + " foto(s) guardada(s).");
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+</script>
+
+</body>
+</html>
