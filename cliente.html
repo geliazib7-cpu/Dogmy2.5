@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2e7d32">
+
+<title>Mi Perro - DogMy</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffe600, #7ed957);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.contenedor {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.tarjeta {
+    width: 90%;
+    max-width: 420px;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    text-align: center;
+}
+
+h1 {
+    color: #2e7d32;
+    margin-bottom: 5px;
+    font-size: 24px;
+}
+
+.subtitulo {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+h3 {
+    color: #2e7d32;
+    margin: 15px 0 10px 0;
+    text-align: left;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1b5e20;
+}
+
+.estado-paseo {
+    padding: 15px;
+    border-radius: 12px;
+    margin: 15px 0;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.en-curso {
+    background: #fff3cd;
+    color: #856404;
+    border: 2px solid #ffc107;
+    animation: pulse 2s infinite;
+}
+
+.disponible {
+    background: #d4edda;
+    color: #155724;
+    border: 2px solid #28a745;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.mapa-cliente {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border: 2px dashed #2196f3;
+    border-radius: 15px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+    padding: 20px;
+    flex-direction: column;
+}
+
+.mapa-cliente p {
+    color: #1565c0;
+    margin: 5px 0;
+}
+
+.info-box {
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    text-align: left;
+}
+
+.info-box p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.perro-box {
+    background: #e8f5e9;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    text-align: left;
+}
+
+.perro-box p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.cerrar {
+    background: #d32f2f !important;
+    margin-top: 20px;
+}
+
+.cerrar:hover {
+    background: #b71c1c !important;
+}
+</style>
+</head>
+<body>
+<div class="contenedor">
+<div class="tarjeta">
+
+<h1>🐶 Mi Perro</h1>
+<p class="subtitulo" id="nombreCliente">Bienvenido</p>
+
+<div id="estadoPaseo" class="estado-paseo disponible">
+    🟢 Tu perro está en casa
+</div>
+
+<div class="mapa-cliente" id="mapaCliente">
+    <p style="font-size:60px;">🏠</p>
+    <p>Esperando inicio de paseo...</p>
+</div>
+
+<p id="infoUbicacion" style="color:#666;font-size:14px;"></p>
+
+<hr>
+
+<h3>📋 Mis Datos</h3>
+<div class="info-box" id="misDatos">
+    <p>Cargando...</p>
+</div>
+
+<hr>
+
+<h3>🐕 Mi Perro</h3>
+<div id="misPerros">
+    <p>Cargando...</p>
+</div>
+
+<button onclick="window.location.href='index.html'" class="cerrar">🚪 Cerrar Sesión</button>
+
+</div>
+</div>
+
+<script>
+// ======================================
+// PANEL CLIENTE - CON RASTREO
+// ======================================
+
+const clienteActual = JSON.parse(localStorage.getItem("clienteActual"));
+if (!clienteActual) {
+    window.location.href = "index.html";
+} else {
+    document.getElementById("nombreCliente").textContent = "Hola, " + clienteActual.nombre;
+}
+
+// Mostrar datos del cliente
+const misDatos = document.getElementById("misDatos");
+misDatos.innerHTML = `
+    <p><b>📞 Teléfono:</b> ${clienteActual.telefono}</p>
+    <p><b>📍 Dirección:</b> ${clienteActual.direccion}</p>
+    <p><b>👤 Usuario:</b> ${clienteActual.usuario}</p>
+`;
+
+// Mostrar perros del cliente
+const perros = JSON.parse(localStorage.getItem("perros")) || [];
+const misPerrosLista = perros.filter(p => p.clienteId === clienteActual.id);
+const misPerros = document.getElementById("misPerros");
+
+if (misPerrosLista.length === 0) {
+    misPerros.innerHTML = "<p>No tienes perros registrados.</p>";
+} else {
+    misPerros.innerHTML = "";
+    misPerrosLista.forEach(p => {
+        misPerros.innerHTML += `
+        <div class="perro-box">
+            <p><b>🐶 ${p.nombre}</b> (${p.raza})</p>
+            <p>Edad: ${p.edad} años | Tamaño: ${p.tamano || "N/A"}</p>
+            <p>📅 ${p.dias.join(", ") || "Sin días"} | 🕒 ${p.hora || "Sin hora"}</p>
+            <p>🚶 Paseador: ${getPaseadorNombre(p.paseadorId)}</p>
+        </div>`;
+    });
+}
+
+function getPaseadorNombre(id) {
+    const paseadores = JSON.parse(localStorage.getItem("paseadores")) || [];
+    const p = paseadores.find(p => p.id == id);
+    return p ? p.nombre : "Sin asignar";
+}
+
+// ======================================
+// RASTREO EN TIEMPO REAL
+// ======================================
+function actualizarEstadoCliente() {
+    const paseadores = JSON.parse(localStorage.getItem("paseadores")) || [];
+    const perros = JSON.parse(localStorage.getItem("perros")) || [];
+    
+    const misPerros = perros.filter(p => p.clienteId === clienteActual.id);
+    const paseadorAsignado = misPerros.length > 0 ? misPerros[0].paseadorId : null;
+    const paseadorActivo = paseadores.find(p => p.id == paseadorAsignado && p.activo);
+
+    const estadoPaseo = document.getElementById("estadoPaseo");
+    const infoUbicacion = document.getElementById("infoUbicacion");
+    const mapaCliente = document.getElementById("mapaCliente");
+
+    if (paseadorActivo) {
+        // PASEO EN CURSO
+        estadoPaseo.className = "estado-paseo en-curso";
+        estadoPaseo.innerHTML = "🟡 ¡Tu perro está en paseo!";
+        
+        const tiempo = paseadorActivo.horaInicio ? calcularTiempo(paseadorActivo.horaInicio) : "00:00:00";
+        
+        let mapaHTML = '<p style="font-size:50px;">🗺️</p>';
+        mapaHTML += '<p><b>🚶 Paseador: ' + paseadorActivo.nombre + '</b></p>';
+        mapaHTML += '<p>⏱️ Tiempo: ' + tiempo + '</p>';
+        
+        if (paseadorActivo.lat && paseadorActivo.lon) {
+            mapaHTML += '<p>📍 Ubicación activa</p>';
+            mapaHTML += '<p style="font-size:12px;">Lat: ' + paseadorActivo.lat.toFixed(5) + '</p>';
+            mapaHTML += '<p style="font-size:12px;">Lon: ' + paseadorActivo.lon.toFixed(5) + '</p>';
+            infoUbicacion.innerHTML = "📍 Tu paseador está compartiendo su ubicación en tiempo real";
+        } else {
+            mapaHTML += '<p style="color:#999;">📍 Esperando ubicación...</p>';
+            infoUbicacion.innerHTML = "El paseador aún no ha compartido su ubicación";
+        }
+        
+        mapaCliente.innerHTML = mapaHTML;
+
+    } else {
+        // SIN PASEO
+        estadoPaseo.className = "estado-paseo disponible";
+        estadoPaseo.innerHTML = "🟢 Tu perro está en casa";
+        mapaCliente.innerHTML = '<p style="font-size:60px;">🏠</p><p>Tu perro está seguro en casa</p>';
+        infoUbicacion.innerHTML = "Esperando inicio de paseo...";
+    }
+}
+
+function calcularTiempo(horaInicio) {
+    const inicio = new Date(horaInicio);
+    const ahora = new Date();
+    const diff = Math.floor((ahora - inicio) / 1000);
+    const h = Math.floor(diff / 3600);
+    const m = Math.floor((diff % 3600) / 60);
+    const s = diff % 60;
+    return h.toString().padStart(2, "0") + ":" +
+           m.toString().padStart(2, "0") + ":" +
+           s.toString().padStart(2, "0");
+}
+
+// Actualizar cada 3 segundos
+actualizarEstadoCliente();
+setInterval(actualizarEstadoCliente, 3000);
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function() {});
+}
+</script>
+
+</body>
+</html>
