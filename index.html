@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#2e7d32">
+
+<title>DogMy - Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="contenedor">
+<div class="tarjeta">
+<img src="img/logo.jpg" class="logo" alt="DOGMY">
+
+
+<h1>🐕 DOGMY</h1>
+<p class="subtitulo">Compañero de Vida</p>
+
+<input type="text" id="usuario" placeholder="Usuario">
+<input type="password" id="contrasena" placeholder="Contraseña">
+
+<button id="btnIngresar">🐾 Ingresar</button>
+
+<p class="version">Versión <strong>2.5</strong></p>
+</div>
+</div>
+<script src="script.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log('Service Worker registrado', reg))
+      .catch(err => console.log('Error al registrar SW', err));
+  }
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function() {});
+}
+</script>
+
+</body>
+</html>
