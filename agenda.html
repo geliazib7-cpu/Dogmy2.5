@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda de Paseos</title>
+<link rel="stylesheet" href="style.css">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2e7d32">
+
+</head>
+<body>
+<div class="contenedor">
+<div class="tarjeta">
+
+<h1>📅 Agenda de Paseos</h1>
+<p class="subtitulo">Perros registrados</p>
+
+<hr><br>
+
+<div id="filtroAgenda" style="margin-bottom:15px;">
+    <select id="filtroPaseador" onchange="filtrarAgenda()">
+        <option value="">Todos los paseadores</option>
+    </select>
+</div>
+
+<div id="listaAgenda"></div>
+
+<br><br>
+<button onclick="window.location.href='registro.html'">🐶 Registrar Cliente + Perro</button>
+<br><br>
+<button onclick="history.back()">⬅ Volver</button>
+
+</div>
+</div>
+<script src="script.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function() {});
+}
+</script>
+
+</body>
+</html>
